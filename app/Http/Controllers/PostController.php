@@ -40,6 +40,32 @@ class PostController extends Controller
         }
     }
 
+    public function edit($id){
+        $post = Post::find($id);
+        return view('admin.posts.edit')->with('post', $post);
+    }
+
+    public function update(Request $request, $id)
+    {
+        // dd($request);
+        $post = Post::findOrFail($id);
+        if($request->hasFile("photo")){
+            $name=$request->file("photo")->getClientOriginalName();
+            $file=$request->file("photo")->storeAs('img',$name);
+            // dd($name);
+            $post->update([
+                "photo"=>$name,
+                "title"=>$request->title,
+                "content"=>$request->content
+            ]);
+        }else{
+            $input = $request->all();
+            $post->update($input);
+        }
+        
+        return redirect()->back()->with('flash_message', 'Record Updated!');
+    }
+
     public function destroy($id)
     {
         Post::destroy($id);
